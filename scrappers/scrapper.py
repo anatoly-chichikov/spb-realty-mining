@@ -30,7 +30,7 @@ class Scrapper(CrawlSpider):
                 return
 
             self.storage.append_data([
-                response.url + '\t' + data.replace('\n', '').replace('\r', '')
+                response.url + '\t' + data.replace('\n', '').replace('\r', '').replace('\t', ' ')
             ])
         else:
             self.storage.clean_data()
