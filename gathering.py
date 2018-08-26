@@ -125,7 +125,7 @@ import logging
 from scrapy.crawler import CrawlerProcess
 
 from scrappers.scrapper import CrawlingTask
-from start import ShellArgs, App
+from start import ShellArgs, ChosenApp
 from storages.file_storage import FileStorage
 
 logging.basicConfig(level=logging.INFO)
@@ -135,7 +135,7 @@ SCRAPPED_FILE = 'scrapped_data.txt'
 TABLE_FORMAT_FILE = 'data.csv'
 
 if __name__ == '__main__':
-    App(
+    ChosenApp(
         ShellArgs(),
         CrawlingTask(
             FileStorage(SCRAPPED_FILE),

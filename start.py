@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class App:
+class ChosenApp:
 
     def __init__(self, args, crawling):
         self.args = args
