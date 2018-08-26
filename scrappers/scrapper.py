@@ -47,7 +47,7 @@ class Scrapper(CrawlSpider):
         nav_blocks = BeautifulSoup(data, 'html.parser').select("table.tb_navi")
 
         if not nav_blocks:
-            logger.error("{}", data)
+            logger.error("{}".format(data))
             raise IOError("Invalid page: {}, no navigation blocks".format(url))
 
         all_nums = []
