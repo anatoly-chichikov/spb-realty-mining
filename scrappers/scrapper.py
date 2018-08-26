@@ -1,31 +1,35 @@
 import logging
-import requests
 
+from scrapy import Request
+from scrapy.spiders import CrawlSpider
 
 logger = logging.getLogger(__name__)
 
 
-class Scrapper(object):
-    def __init__(self, skip_objects=None):
-        self.skip_objects = skip_objects
+class Scrapper(CrawlSpider):
+    name = 'realty-spb'
 
-    def scrap_process(self, storage):
+    allowed_domains = ['pin7.ru']
+    start_urls = ['https://pin7.ru/online.php']
 
-        # You can iterate over ids, or get list of objects
-        # from any API, or iterate throught pages of any site
-        # Do not forget to skip already gathered data
-        # Here is an example for you
-        url = 'https://otus.ru/'
-        response = requests.get(url)
+    page = 0
 
-        if not response.ok:
-            logger.error(response.text)
-            # then continue process, or retry, or fix your code
+    def __init__(self, *a, **kw):
+        self.pcode = kw['cookie']
+        self.storage = kw['storage']
+        super().__init__(*a, **kw)
 
-        else:
-            # Note: here json can be used as response.json
-            data = response.text
+    def parse(self, response):
+        data = response.text
 
-            # save scrapped objects here
-            # you can save url to identify already scrapped objects
-            storage.write_data([url + '\t' + data.replace('\n', '')])
+        if self.page > 0:
+            result = [response.url + '\t' + data.replace('\n', '').replace('\r', '')]
+            self.storage.append_data(result)
+
+        self.page += 1
+
+        return Request(
+            url='https://pin7.ru/online.php?numpage=' + str(self.page),
+            cookies={"pcode": self.pcode},
+            callback=self.parse
+        )

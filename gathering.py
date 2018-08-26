@@ -121,8 +121,9 @@ pep8 .
 """
 
 import logging
+import argparse
 
-import sys
+from scrapy.crawler import CrawlerProcess
 
 from scrappers.scrapper import Scrapper
 from storages.file_storage import FileStorage
@@ -130,18 +131,52 @@ from storages.file_storage import FileStorage
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 SCRAPPED_FILE = 'scrapped_data.txt'
 TABLE_FORMAT_FILE = 'data.csv'
 
 
-def gather_process():
+def parse_args():
+    cookie_help = """
+    Обязателен для задачи gather!\n
+    Чтобы начать сбор станиц, вы должны авторизоваться в pin7.ru и заполучить персональную куку.
+    Получить её просто - зайти на pin7.ru, ввести любой валидный общедоступный пароль (например 777).
+    В DevTools браузера посмотреть куки при запросе 'https://pin7.ru/online.php'.
+    Нас интересует 'pcode', должна выглядеть примерно так: 'pcode=imvcn7cdnsrqqm0crsl4ubkpp1'.
+    В итоге пишем для запуска сбора: 'python3 -m gathering --task gather --cookie imvcn7cdnsrqqm0crsl4ubkpp1'.
+    """
+    task_help = """
+    Вы можете выбрать одну из задач:
+    gather - сбор информации из pin7.ru,
+    transform - парсинг страниц и сохранение в CSV,
+    stats - вывод основных статистик по полученному результату.
+    Пример запуска: 'python3 -m gathering --task stats'
+    """
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--task', required=True, help=task_help, choices=['gather', 'transform', 'stats'])
+    parser.add_argument('--cookie', help=cookie_help)
+
+    parsed = parser.parse_args()
+
+    if (parsed.task == 'gather') and (parsed.cookie is None):
+        raise argparse.ArgumentTypeError('--cookie is required for gather task')
+
+    return parsed
+
+
+def gather_process(cookie):
     logger.info("gather")
     storage = FileStorage(SCRAPPED_FILE)
 
-    # You can also pass a storage
-    scrapper = Scrapper()
-    scrapper.scrap_process(storage)
+    process = CrawlerProcess({
+        'DOWNLOAD_DELAY': 1,
+        'USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) '
+                      'AppleWebKit/605.1.15 (KHTML, like Gecko) '
+                      'Version/11.1.2 Safari/605.1.15'
+    })
+
+    process.crawl(Scrapper, cookie=cookie, storage=storage)
+    process.start()
 
 
 def convert_data_to_table_format():
@@ -166,15 +201,17 @@ if __name__ == '__main__':
     why main is so...?
     https://stackoverflow.com/questions/419163/what-does-if-name-main-do
     """
+    args = parse_args()
+
     logger.info("Work started")
 
-    if sys.argv[1] == 'gather':
-        gather_process()
+    if args.task == 'gather':
+        gather_process(args.cookie)
 
-    elif sys.argv[1] == 'transform':
+    elif args.task == 'transform':
         convert_data_to_table_format()
 
-    elif sys.argv[1] == 'stats':
+    elif args.task == 'stats':
         stats_of_data()
 
-    logger.info("work ended")
+    logger.info("Work ended")
