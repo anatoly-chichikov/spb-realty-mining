@@ -7,7 +7,18 @@ from scrapy.spiders import CrawlSpider
 logger = logging.getLogger(__name__)
 
 
-class Scrapper(CrawlSpider):
+class CrawlingTask:
+
+    def __init__(self, storage, process):
+        self.storage = storage
+        self.process = process
+
+    def await(self, cookie):
+        self.process.crawl(PinSpider, cookie=cookie, storage=self.storage)
+        self.process.start()
+
+
+class PinSpider(CrawlSpider):
     name = 'realty-spb'
 
     allowed_domains = ['pin7.ru']

@@ -120,12 +120,12 @@ pep8 .
 
 """
 
-import logging
 import argparse
+import logging
 
 from scrapy.crawler import CrawlerProcess
 
-from scrappers.scrapper import Scrapper
+from scrappers.scrapper import CrawlingTask
 from storages.file_storage import FileStorage
 
 logging.basicConfig(level=logging.INFO)
@@ -166,25 +166,21 @@ def parse_args():
 
 def gather_process(cookie):
     logger.info("gather")
-    storage = FileStorage(SCRAPPED_FILE)
 
-    process = CrawlerProcess({
-        'DOWNLOAD_DELAY': 1,
-        'USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) '
-                      'AppleWebKit/605.1.15 (KHTML, like Gecko) '
-                      'Version/11.1.2 Safari/605.1.15'
-    })
-
-    process.crawl(Scrapper, cookie=cookie, storage=storage)
-    process.start()
+    CrawlingTask(
+        FileStorage(SCRAPPED_FILE),
+        CrawlerProcess({
+            'DOWNLOAD_DELAY': 1,
+            'USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) '
+                          'AppleWebKit/605.1.15 (KHTML, like Gecko) '
+                          'Version/11.1.2 Safari/605.1.15'
+        })
+    ).await(cookie)
 
 
 def convert_data_to_table_format():
     logger.info("transform")
-
-    # Your code here
-    # transform gathered data from txt file to pandas DataFrame and save as csv
-    pass
+    storage = FileStorage(SCRAPPED_FILE)
 
 
 def stats_of_data():
