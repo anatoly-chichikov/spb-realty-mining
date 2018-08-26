@@ -19,7 +19,6 @@ class App:
             self.gather_process(args.cookie)
         elif args.task == 'transform':
             self.convert_data_to_table_format()
-
         elif args.task == 'stats':
             self.stats_of_data()
 
