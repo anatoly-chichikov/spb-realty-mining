@@ -15,3 +15,7 @@ class Storage(object):
     @abc.abstractmethod
     def append_data(self, data):
         raise NotImplementedError
+
+    @abc.abstractmethod
+    def clean_data(self):
+        raise NotImplementedError

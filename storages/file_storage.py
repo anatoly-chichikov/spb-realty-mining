@@ -1,6 +1,9 @@
+import logging
 import os
 
 from storages.storage import Storage
+
+logger = logging.getLogger(__name__)
 
 
 class FileStorage(Storage):
@@ -38,3 +41,8 @@ class FileStorage(Storage):
                     f.write(line)
                 else:
                     f.write(line + '\n')
+
+    def clean_data(self):
+        if os.path.isfile(self.file_name):
+            logger.info("Found old crawling data, removing... {}".format(self.file_name))
+            os.remove(self.file_name)
