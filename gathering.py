@@ -124,11 +124,12 @@ import logging
 
 from scrapy.crawler import CrawlerProcess
 
+from parsers.parser import ParsedPages
 from scrappers.scrapper import CrawlingTask
 from start import ShellArgs, ChosenApp
+from storages.csv_storage import CsvStorage
 from storages.file_storage import FileStorage
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 SCRAPPED_FILE = 'scrapped_data.txt'
@@ -141,10 +142,16 @@ SCRAPPY_CONF = {
 }
 
 if __name__ == '__main__':
+    file_storage = FileStorage(SCRAPPED_FILE)
+
     ChosenApp(
         ShellArgs(),
         CrawlingTask(
-            FileStorage(SCRAPPED_FILE),
+            file_storage,
             CrawlerProcess(SCRAPPY_CONF)
+        ),
+        ParsedPages(
+            file_storage,
+            CsvStorage(TABLE_FORMAT_FILE)
         )
     ).start()

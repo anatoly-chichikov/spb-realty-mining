@@ -6,9 +6,10 @@ logger = logging.getLogger(__name__)
 
 class ChosenApp:
 
-    def __init__(self, args, crawling):
+    def __init__(self, args, crawling, parsed):
         self.args = args
         self.crawling = crawling
+        self.parsed = parsed
 
     def start(self):
         logger.info("Work started")
@@ -31,6 +32,8 @@ class ChosenApp:
 
     def convert_data_to_table_format(self):
         logger.info("transform")
+
+        self.parsed.save()
 
     def stats_of_data(self):
         logger.info("stats")
