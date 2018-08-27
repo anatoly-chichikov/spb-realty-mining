@@ -10,28 +10,28 @@ def clean_id(crude_row):
 def clean_room(room):
     room = room.lower()
 
-    if u'студия' in room:
-        room = u's'
-    elif room.startswith(u'2к.кв'):
-        room = u'f2'
-    elif room.startswith(u'3к.кв'):
-        room = u'f3'
-    elif room.startswith(u'4к.кв'):
-        room = u'f4'
-    elif room.startswith(u'к2('):
-        room = u'r2'
-    elif room.startswith(u'к3('):
-        room = u'r3+'
-    elif room.startswith(u'1к.кв'):
-        room = u'f1'
-    elif u'комната' in room:
-        room = u'r1'
-    elif u'дом' in room:
-        room = u'h'
-    elif u'к.кв' in room:
-        room = u'f5+'
+    if 'студия' in room:
+        room = 's'
+    elif room.startswith('2к.кв'):
+        room = 'f2'
+    elif room.startswith('3к.кв'):
+        room = 'f3'
+    elif room.startswith('4к.кв'):
+        room = 'f4'
+    elif room.startswith('к2('):
+        room = 'r2'
+    elif room.startswith('к3('):
+        room = 'r3+'
+    elif room.startswith('1к.кв'):
+        room = 'f1'
+    elif 'комната' in room:
+        room = 'r1'
+    elif 'дом' in room:
+        room = 'h'
+    elif 'к.кв' in room:
+        room = 'f5+'
     else:
-        room = u'o'
+        room = 'o'
 
     return room
 
@@ -46,13 +46,13 @@ def clean_type(crude_row):
     room = clean_room(room)
     date = datetime.strptime(date, '%H:%M %d.%m.%y')
 
-    if action == u'сниму':
+    if action == 'сниму':
         action = 'rent'
-    elif action == u'куплю':
+    elif action == 'куплю':
         action = 'buy'
-    elif action == u'продам':
+    elif action == 'продам':
         action = 'sell'
-    elif action == u'сдам':
+    elif action == 'сдам':
         action = 'rent_out'
 
     return {
@@ -73,10 +73,10 @@ def clean_address(crude_row):
     if len(crude_note) > 0:
         note = crude_note[0].text.strip()
 
-    district = [d.strip() for d in crude_district.replace(u'р-н', '').split(',')][0].lower()
+    district = [d.strip() for d in crude_district.replace('р-н', '').split(',')][0].lower()
     street = ' '.join(soup.text
                       .replace(crude_district, '')
-                      .replace(u'на карте', '')
+                      .replace('на карте', '')
                       .replace(note, '')
                       .split()).lower()
 
@@ -102,7 +102,7 @@ def clean_subway(crude_row):
             found_distance = crude_distance[0].text
             distance_to_replace = found_distance
 
-            if u'км' in found_distance:
+            if 'км' in found_distance:
                 computed_distance = float(found_distance.strip().split()[0]) * 1000
             else:
                 computed_distance = float(found_distance.strip().split()[0])
@@ -114,7 +114,10 @@ def clean_subway(crude_row):
             'distance': computed_distance
         })
 
-    return sorted(result, key=lambda s: s['distance'])
+    if not result:
+        return {}
+
+    return sorted(result, key=lambda s: s['distance'])[0]
 
 
 def clean_price(crude_row):
@@ -142,11 +145,11 @@ def clean_price(crude_row):
     if len(split_price) == 2:
         period_abbr = split_price[1]
 
-        if period_abbr == u'руб/сут':
+        if period_abbr == 'руб/сут':
             period = 'daily'
-        elif period_abbr == u'руб/мес':
+        elif period_abbr == 'руб/мес':
             period = 'monthly'
-        elif period_abbr == u'руб':
+        elif period_abbr == 'руб':
             period = 'once'
 
     return {
@@ -163,7 +166,7 @@ def clean_size(crude_options):
 
         if crude_size == '?':
             size = 0
-        elif re.search(u'[а-я]+', crude_size):
+        elif re.search('[а-я]+', crude_size):
             size = 0
         elif '+' in crude_size:
             size = sum([
@@ -188,16 +191,16 @@ def clean_floors(crude_options):
     prepared = [
         x.strip()
         for x in text_opts.split('\n')
-        if u'эт' in x
+        if 'эт' in x
     ]
 
     if not prepared:
         return 0, 0
 
     floors = [
-        x.replace(u'эт', '').strip()
+        x.replace('эт', '').strip()
         for x in prepared[0].split(',')
-        if u'эт' in x
+        if 'эт' in x
     ]
 
     floor, total_floors = floors[0].split('/')
@@ -205,24 +208,26 @@ def clean_floors(crude_options):
     if total_floors == '?':
         total_floors = 0
     else:
-        total_floors = int(total_floors)
+        total_floors = int(total_floors.split(" ")[0])
 
     if floor == '-':
         floor = 1
-    elif floor.lower() == u'цок':
+    elif floor.lower() == 'цок':
         floor = -1
-    elif floor.lower() == u'подв':
+    elif floor.lower() == 'подв':
         floor = -1
-    elif floor.lower() == u'манс':
+    elif floor.lower() == 'манс':
         floor = total_floors
-    elif floor.lower() == u'белэт':
+    elif floor.lower() == 'белэт':
         floor = 2
     elif floor.lower() == '?':
         floor = 0
-    elif floor.lower() == u'техэт':
+    elif floor.lower() == 'техэт':
         floor = 0
-    elif floor.lower() == u'все':
+    elif floor.lower() == 'все':
         floor = total_floors
+    elif floor.lower().startswith('кух'):
+        floor = int(floor.split(' ')[1])
     else:
         floor = int(floor)
 
@@ -239,27 +244,27 @@ def clean_options(crude_row):
         x.strip()
         for x in crude_options.text.split('\n')
         if x.strip()
-    ]).split(u' эт')
+    ]).split(' эт')
 
     tags = []
 
     if len(prepared) is 2:
-        tags = [tag.strip() for tag in prepared[1].lower().replace(u'жф', '').split(',')]
+        tags = [tag.strip() for tag in prepared[1].lower().replace('жф', '').split(',')]
 
     has_elevator = False
     has_balcony = False
     house_state = 'old'
 
     for tag in tags:
-        if u'лдж' in tag:
+        if 'лдж' in tag:
             has_balcony = True
-        if u'блк' in tag:
+        if 'блк' in tag:
             has_balcony = True
-        if u'есть лифт' in tag:
+        if 'есть лифт' in tag:
             has_elevator = True
-        if u'новый дом' in tag:
+        if 'новый дом' in tag:
             house_state = 'new'
-        if u'сф пкр' in tag:
+        if 'сф пкр' in tag:
             house_state = 'renovated'
 
     return {
@@ -278,7 +283,7 @@ def clean_notes(crude_row):
     all_notes = [
         note.strip().lower()
         for note in re.split(',|\n|\\|', crude_notes.text)
-        if note.strip() != '' and u'комиссия' not in note.lower() and '+' not in note
+        if note.strip() != '' and 'комиссия' not in note.lower() and '+' not in note
     ]
 
     cool_renovation = False
@@ -294,42 +299,42 @@ def clean_notes(crude_row):
     has_parking = False
 
     for note in all_notes:
-        if u'есть хол-к' in note:
+        if 'есть хол-к' in note:
             has_fridge = True
-        if u'есть инт' in note:
+        if 'есть инт' in note:
             has_network_access = True
-        if u'есть меб' in note:
+        if 'есть меб' in note:
             has_furniture = True
-        if u'есть ст/маш' in note:
+        if 'есть ст/маш' in note:
             has_washer = True
-        if u'есть тв' in note:
+        if 'есть тв' in note:
             has_tv = True
-        if u'посудом/маш' in note or u'встр посудом/маш' in note:
+        if 'посудом/маш' in note or 'встр посудом/маш' in note:
             has_dishwasher = True
-        if u'без/дет' in note or u'без/мал/дет' in note:
+        if 'без/дет' in note or 'без/мал/дет' in note:
             allowed_children = False
-        if u'можно с животн' in note or u'с животн' in note:
+        if 'можно с животн' in note or 'с животн' in note:
             allowed_pets = True
-        if u'паркинг' in note or u'парковка' in note:
+        if 'паркинг' in note or 'парковка' in note:
             has_parking = True
-        if u'чистая парадная' in note \
-                or u'нов/дом' in note \
-                or u'нов/квартал' in note \
-                or u'элитн/дом' in note \
-                or u'квартира бизнес-класса' in note \
-                or u'дом бизнес-класса' in note \
-                or u'элитный жил/компл' in note:
+        if 'чистая парадная' in note \
+                or 'нов/дом' in note \
+                or 'нов/квартал' in note \
+                or 'элитн/дом' in note \
+                or 'квартира бизнес-класса' in note \
+                or 'дом бизнес-класса' in note \
+                or 'элитный жил/компл' in note:
             clean_front = True
-        if u'евро/рем' in note \
-                or u'квартира бизнес-класса' in note \
-                or u'элитный жил/компл' in note \
-                or u'высок кач-во внутр/отд-ки' in note \
-                or u'дизайнерский интерьер' in note \
-                or u'дизайн' in note \
-                or u'идеальн/сост' in note \
-                or u'отл/сост' in note \
-                or u'элитн/дом' in note \
-                or u'дом бизнес-класса' in note:
+        if 'евро/рем' in note \
+                or 'квартира бизнес-класса' in note \
+                or 'элитный жил/компл' in note \
+                or 'высок кач-во внутр/отд-ки' in note \
+                or 'дизайнерский интерьер' in note \
+                or 'дизайн' in note \
+                or 'идеальн/сост' in note \
+                or 'отл/сост' in note \
+                or 'элитн/дом' in note \
+                or 'дом бизнес-класса' in note:
             cool_renovation = True
 
     return {
@@ -348,13 +353,16 @@ def clean_notes(crude_row):
 
 
 def clean_row(row):
+    options = clean_options(row)
+    options.update(clean_notes(row))
+    
     clean = {
-        '_id': clean_id(row),
+        'id': clean_id(row),
         'type': clean_type(row),
         'address': clean_address(row),
         'subway': clean_subway(row),
         'price': clean_price(row),
-        'options': clean_options(row).update(clean_notes(row))
+        'options': options  
     }
 
     return clean
