@@ -17,10 +17,6 @@ class CsvStorage(Storage):
         return pd.read_csv(self.file_name)
 
     def write_data(self, data_rows):
-        """
-        :param data_rows: collection of dicts that
-        should be written as csv rows
-        """
         pd.DataFrame(
             json_normalize(
                 data_rows

@@ -20,10 +20,6 @@ class FileStorage(Storage):
                 yield line.strip()
 
     def write_data(self, data_array):
-        """
-        :param data_array: collection of strings that
-        should be written as lines
-        """
         with open(self.file_name, 'w') as f:
             for line in data_array:
                 if line.endswith('\n'):
@@ -32,9 +28,6 @@ class FileStorage(Storage):
                     f.write(line + '\n')
 
     def append_data(self, data):
-        """
-        :param data: string
-        """
         with open(self.file_name, 'a') as f:
             for line in data:
                 if line.endswith('\n'):
