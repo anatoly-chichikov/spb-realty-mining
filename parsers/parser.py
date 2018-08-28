@@ -23,7 +23,7 @@ class ParsedPages:
                 PinPage(url, text).rows()
             )
 
-        logger.info("All pages have been parsed: {}".format(len(result)))
+        logger.info("All pages have been parsed: {} rows found".format(len(result)))
 
         self.csv.write_data(result)
 
