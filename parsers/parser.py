@@ -10,13 +10,13 @@ logger = logging.getLogger(__name__)
 class ParsedPages:
 
     def __init__(self, file, csv):
-        self.file = file
-        self.csv = csv
+        self._file = file
+        self._csv = csv
 
     def save(self):
         result = []
 
-        for row in self.file.read_data():
+        for row in self._file.read_data():
             (url, text) = row.split('\t')
 
             result.extend(
@@ -25,19 +25,19 @@ class ParsedPages:
 
         logger.info("All pages have been parsed: {} rows found".format(len(result)))
 
-        self.csv.write_data(result)
+        self._csv.write_data(result)
 
 
 class PinPage:
 
     def __init__(self, url, page):
-        self.url = url
-        self.page = page
+        self._url = url
+        self._page = page
 
     def rows(self):
         result = []
 
-        soup = BeautifulSoup(self.page, 'html.parser')
+        soup = BeautifulSoup(self._page, 'html.parser')
 
         for br in soup.find_all("br"):
             br.replace_with("\n")
@@ -50,9 +50,9 @@ class PinPage:
                 result.append(clean_row(row))
                 number += 1
             except Exception as e:
-                logger.exception('Failed on %s. Row %s. %s', self.url, number, str(e))
+                logger.exception('Failed on %s. Row %s. %s', self._url, number, str(e))
                 logger.error(row)
 
-        logger.info("Url parsed: {}, found rows: {}".format(self.url, len(result)))
+        logger.info("Url parsed: {}, found rows: {}".format(self._url, len(result)))
 
         return result

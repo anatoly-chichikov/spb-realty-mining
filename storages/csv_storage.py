@@ -11,17 +11,17 @@ logger = logging.getLogger(__name__)
 class CsvStorage(Storage):
 
     def __init__(self, file_name):
-        self.file_name = file_name
+        self._file_name = file_name
 
     def read_data(self):
-        return pd.read_csv(self.file_name)
+        return pd.read_csv(self._file_name)
 
     def write_data(self, data_rows):
         pd.DataFrame(
             json_normalize(
                 data_rows
             )
-        ).to_csv(self.file_name, index=False)
+        ).to_csv(self._file_name, index=False)
 
     def append_data(self, data):
         raise NotImplementedError

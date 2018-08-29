@@ -7,35 +7,35 @@ logger = logging.getLogger(__name__)
 class ChosenApp:
 
     def __init__(self, args, crawling, parsed):
-        self.args = args
-        self.crawling = crawling
-        self.parsed = parsed
+        self._args = args
+        self._crawling = crawling
+        self._parsed = parsed
 
     def start(self):
         logger.info("Work started")
 
-        args = self.args.parsed()
+        args = self._args.parsed()
 
         if args.task == 'gather':
-            self.gather_process(args.cookie)
+            self._gather_process(args.cookie)
         elif args.task == 'transform':
-            self.convert_data_to_table_format()
+            self._convert_data_to_table_format()
         elif args.task == 'stats':
-            self.stats_of_data()
+            self._stats_of_data()
 
         logger.info("Work ended")
 
-    def gather_process(self, cookie):
+    def _gather_process(self, cookie):
         logger.info("gather")
 
-        self.crawling.await(cookie)
+        self._crawling.await(cookie)
 
-    def convert_data_to_table_format(self):
+    def _convert_data_to_table_format(self):
         logger.info("transform")
 
-        self.parsed.save()
+        self._parsed.save()
 
-    def stats_of_data(self):
+    def _stats_of_data(self):
         logger.info("stats")
 
 
