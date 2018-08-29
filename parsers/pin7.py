@@ -2,7 +2,7 @@ import logging
 
 from bs4 import BeautifulSoup
 
-from parsers.cleanings import clean_row
+from parsers.pin7_cleanings import clean_row
 
 logger = logging.getLogger(__name__)
 

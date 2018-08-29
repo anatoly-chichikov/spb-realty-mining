@@ -124,11 +124,10 @@ import logging
 
 from scrapy.crawler import CrawlerProcess
 
-from parsers.parser import ParsedPages
-from scrappers.scrapper import CrawlingTask
-from start import ShellArgs, ChosenApp
-from storages.csv_storage import CsvStorage
-from storages.file_storage import FileStorage
+from parsers.pin7 import ParsedPages
+from scrappers.pin7 import CrawlingTask
+from shell.args import ShellArgs, ChosenApp
+from storages.local import CsvStorage, FileStorage
 
 logger = logging.getLogger(__name__)
 
