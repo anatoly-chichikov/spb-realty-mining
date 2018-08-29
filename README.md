@@ -9,6 +9,7 @@
 
 _Для установки и работы требуется Python 3._
 
+### Установка
 Для начала нужно склонировать репозиторий и установить зависимости:
 ```bash
 git clone git@github.com:anatoly-chichikov/spb-realty-mining.git
@@ -26,18 +27,18 @@ pip install -r requirements.txt
 - получить значение cookie `pcode`
 - начать сбор и дождаться окончания (~10 минут)
 ```bash
-python3 -m gathering --task gather --cookie imvcn7cdnsrqqm0crsl4ubkpp1
+python3 -m realty --task gather --cookie imvcn7cdnsrqqm0crsl4ubkpp1
 ```
 
 ### Обработка
 После сбора генерим нашу CSV - `data.csv`. Теперь можете самостоятельно фильтровать предложения
 и отправить их id своему агенту. 
 ```bash
-python3 -m gathering --task transform
+python3 -m realty --task transform
 ```
 
 ### Статистики
 Если имеется готовая CSV, можно посмотреть основные статистики по рынку:
 ```bash
-python3 -m gathering --task stats
+python3 -m realty --task stats
 ```

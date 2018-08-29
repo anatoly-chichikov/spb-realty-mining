@@ -49,7 +49,7 @@ class ShellArgs:
         Получить её просто - зайти на pin7.ru, ввести любой валидный общедоступный пароль (например 777).
         В DevTools браузера посмотреть куки при запросе 'https://pin7.ru/online.php'.
         Нас интересует 'pcode', должна выглядеть примерно так: 'pcode=imvcn7cdnsrqqm0crsl4ubkpp1'.
-        В итоге пишем для запуска сбора: 'python3 -m gathering --task gather --cookie imvcn7cdnsrqqm0crsl4ubkpp1'.
+        В итоге пишем для запуска сбора: 'python3 -m realty --task gather --cookie imvcn7cdnsrqqm0crsl4ubkpp1'.
         """
 
         task_help = """
@@ -57,7 +57,7 @@ class ShellArgs:
         gather - сбор информации из pin7.ru,
         transform - парсинг страниц и сохранение в CSV,
         stats - вывод основных статистик по полученному результату.
-        Пример запуска: 'python3 -m gathering --task stats'
+        Пример запуска: 'python3 -m realty --task stats'
         """
         parser = argparse.ArgumentParser()
 
