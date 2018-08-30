@@ -1,13 +1,16 @@
 # coding=utf-8
 import re
 from datetime import datetime
+from typing import Dict, Tuple, List
+
+from bs4 import Tag
 
 
-def clean_id(crude_row):
+def clean_id(crude_row: Tag) -> int:
     return int(crude_row.select('td.tdm_11')[0].text)
 
 
-def clean_room(room):
+def clean_room(room: Tag) -> str:
     room = room.lower()
 
     if 'студия' in room:
@@ -36,7 +39,7 @@ def clean_room(room):
     return room
 
 
-def clean_type(crude_row):
+def clean_type(crude_row: Tag) -> Dict:
     soup = crude_row.select('td.tdm_01')[0]
 
     action = soup.select('font[color="#CC0033"]')[0].text.strip()
@@ -44,7 +47,7 @@ def clean_type(crude_row):
     room, date = (' '.join(x.split()) for x in soup.text.split(action))
 
     room = clean_room(room)
-    date = datetime.strptime(date, '%H:%M %d.%m.%y')
+    parsed_date = datetime.strptime(date, '%H:%M %d.%m.%y')
 
     if action == 'сниму':
         action = 'rent'
@@ -58,11 +61,11 @@ def clean_type(crude_row):
     return {
         'action': action,
         'rooms': room,
-        'create_date': date
+        'create_date': parsed_date
     }
 
 
-def clean_address(crude_row):
+def clean_address(crude_row: Tag) -> Dict:
     soup = crude_row.select('td.tdm_02')[0]
 
     crude_district = soup.select('span.tdm_rn')[0].text
@@ -86,7 +89,7 @@ def clean_address(crude_row):
     }
 
 
-def clean_subway(crude_row):
+def clean_subway(crude_row: Tag) -> Dict:
     soup = crude_row.select('td.tdm_03')[0]
     stations = soup.select('div[style^="margin-bottom"]')
 
@@ -94,7 +97,7 @@ def clean_subway(crude_row):
 
     for station in stations:
         crude_distance = station.select('span[style^="color"]')
-        computed_distance = 0
+        computed_distance = 0.
 
         distance_to_replace = ''
 
@@ -103,7 +106,7 @@ def clean_subway(crude_row):
             distance_to_replace = found_distance
 
             if 'км' in found_distance:
-                computed_distance = float(found_distance.strip().split()[0]) * 1000
+                computed_distance = float(found_distance.strip().split()[0]) * 1000.
             else:
                 computed_distance = float(found_distance.strip().split()[0])
 
@@ -120,7 +123,7 @@ def clean_subway(crude_row):
     return sorted(result, key=lambda s: s['distance'])[0]
 
 
-def clean_price(crude_row):
+def clean_price(crude_row: Tag) -> Dict:
     crude_price = crude_row.select('td.tdm_05')[0]
 
     crude_note = crude_price.select('span[style^="font-size:11px"]')
@@ -158,16 +161,16 @@ def clean_price(crude_row):
     }
 
 
-def clean_size(crude_options):
-    size = 0
+def clean_size(crude_options: Tag) -> float:
+    size = 0.
 
     if len(crude_options.select('strong')) > 0:
         crude_size = crude_options.select('strong')[0].text.strip().lower()
 
         if crude_size == '?':
-            size = 0
+            size = 0.
         elif re.search('[а-я]+', crude_size):
-            size = 0
+            size = 0.
         elif '+' in crude_size:
             size = sum([
                 float(num)
@@ -186,7 +189,7 @@ def clean_size(crude_options):
     return size
 
 
-def clean_floors(crude_options):
+def clean_floors(crude_options: Tag) -> Tuple:
     text_opts = crude_options.text
     prepared = [
         x.strip()
@@ -234,7 +237,7 @@ def clean_floors(crude_options):
     return floor, total_floors
 
 
-def clean_options(crude_row):
+def clean_options(crude_row: Tag) -> Dict:
     crude_options = crude_row.select('td.tdm_04')[0]
 
     size = clean_size(crude_options)
@@ -277,7 +280,7 @@ def clean_options(crude_row):
     }
 
 
-def clean_notes(crude_row):
+def clean_notes(crude_row: Tag) -> Dict:
     crude_notes = crude_row.select('td.tdm_08')[0]
 
     all_notes = [
@@ -352,17 +355,17 @@ def clean_notes(crude_row):
     }
 
 
-def clean_row(row):
+def clean_row(row: Tag) -> Dict:
     options = clean_options(row)
     options.update(clean_notes(row))
-    
+
     clean = {
         'id': clean_id(row),
         'type': clean_type(row),
         'address': clean_address(row),
         'subway': clean_subway(row),
         'price': clean_price(row),
-        'options': options  
+        'options': options
     }
 
     return clean

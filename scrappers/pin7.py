@@ -1,24 +1,30 @@
 import logging
+from typing import Union, List, Dict
 
 from bs4 import BeautifulSoup
 from scrapy import Request
+from scrapy.crawler import CrawlerProcess
+from scrapy.http import HtmlResponse
 from scrapy.spiders import CrawlSpider
+
+from storages.local import FileStorage
 
 logger = logging.getLogger(__name__)
 
 
 class CrawlingTask:
 
-    def __init__(self, storage, process):
+    def __init__(self, storage: FileStorage, process: CrawlerProcess) -> None:
         self._storage = storage
         self._process = process
 
-    def await(self, cookie):
+    def wait(self, cookie: str) -> None:
         self._process.crawl(PinSpider, cookie=cookie, storage=self._storage)
         self._process.start()
 
 
 class PinSpider(CrawlSpider):
+
     name = 'realty-spb'
 
     allowed_domains = ['pin7.ru']
@@ -26,19 +32,19 @@ class PinSpider(CrawlSpider):
 
     _next = 0
 
-    def __init__(self, *a, **kw):
+    def __init__(self, *a, **kw) -> None:
         self._pcode = kw['cookie']
         self._storage = kw['storage']
         super().__init__(*a, **kw)
 
-    def parse(self, response):
+    def parse(self, response: HtmlResponse) -> Union[Request, None]:
         data = response.text
 
         if self._next > 0:
             total = self._valid_total(data, response.url)
 
             if total < self._next:
-                return
+                return None
 
             self._storage.append_data([
                 response.url + '\t' + data.replace('\n', '').replace('\r', '').replace('\t', ' ')
@@ -54,7 +60,7 @@ class PinSpider(CrawlSpider):
             callback=self.parse
         )
 
-    def _valid_total(self, data, url):
+    def _valid_total(self, data: str, url: str) -> int:
         nav_blocks = BeautifulSoup(data, 'html.parser').select("table.tb_navi")
 
         if not nav_blocks:

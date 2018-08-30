@@ -1,19 +1,21 @@
 import logging
+from typing import List, Dict
 
 from bs4 import BeautifulSoup
 
 from parsers.pin7_cleanings import clean_row
+from storages.local import FileStorage, CsvStorage
 
 logger = logging.getLogger(__name__)
 
 
 class ParsedPages:
 
-    def __init__(self, file, csv):
+    def __init__(self, file: FileStorage, csv: CsvStorage) -> None:
         self._file = file
         self._csv = csv
 
-    def save(self):
+    def save(self) -> None:
         result = []
 
         for row in self._file.read_data():
@@ -30,11 +32,11 @@ class ParsedPages:
 
 class PinPage:
 
-    def __init__(self, url, page):
+    def __init__(self, url: str, page: str) -> None:
         self._url = url
         self._page = page
 
-    def rows(self):
+    def rows(self) -> List[Dict]:
         result = []
 
         soup = BeautifulSoup(self._page, 'html.parser')

@@ -1,48 +1,16 @@
 import argparse
 import logging
 
+from parsers.pin7 import ParsedPages
+from scrappers.pin7 import CrawlingTask
+
 logger = logging.getLogger(__name__)
-
-
-class ChosenApp:
-
-    def __init__(self, args, crawling, parsed):
-        self._args = args
-        self._crawling = crawling
-        self._parsed = parsed
-
-    def start(self):
-        logger.info("Work started")
-
-        args = self._args.parsed()
-
-        if args.task == 'gather':
-            self._gather_process(args.cookie)
-        elif args.task == 'transform':
-            self._convert_data_to_table_format()
-        elif args.task == 'stats':
-            self._stats_of_data()
-
-        logger.info("Work ended")
-
-    def _gather_process(self, cookie):
-        logger.info("gather")
-
-        self._crawling.await(cookie)
-
-    def _convert_data_to_table_format(self):
-        logger.info("transform")
-
-        self._parsed.save()
-
-    def _stats_of_data(self):
-        logger.info("stats")
 
 
 class ShellArgs:
 
     @staticmethod
-    def parsed():
+    def parsed() -> argparse.Namespace:
         cookie_help = """
         Обязателен для задачи gather!\n
         Чтобы начать сбор станиц, вы должны авторизоваться в pin7.ru и заполучить персональную куку.
@@ -70,3 +38,43 @@ class ShellArgs:
             raise argparse.ArgumentTypeError('--cookie is required for gather task')
 
         return parsed
+
+
+class ChosenApp:
+
+    def __init__(
+            self,
+            args: ShellArgs,
+            crawling: CrawlingTask,
+            parsed: ParsedPages
+    ) -> None:
+        self._args = args
+        self._crawling = crawling
+        self._parsed = parsed
+
+    def start(self) -> None:
+        logger.info("Work started")
+
+        args = self._args.parsed()
+
+        if args.task == 'gather':
+            self._gather_process(args.cookie)
+        elif args.task == 'transform':
+            self._convert_data_to_table_format()
+        elif args.task == 'stats':
+            self._stats_of_data()
+
+        logger.info("Work ended")
+
+    def _gather_process(self, cookie: str) -> None:
+        logger.info("gather")
+
+        self._crawling.wait(cookie)
+
+    def _convert_data_to_table_format(self) -> None:
+        logger.info("transform")
+
+        self._parsed.save()
+
+    def _stats_of_data(self) -> None:
+        logger.info("stats")
