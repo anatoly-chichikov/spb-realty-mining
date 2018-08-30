@@ -1,5 +1,5 @@
 import logging
-from typing import Union, List, Dict
+from typing import Union
 
 from bs4 import BeautifulSoup
 from scrapy import Request
@@ -24,7 +24,6 @@ class CrawlingTask:
 
 
 class PinSpider(CrawlSpider):
-
     name = 'realty-spb'
 
     allowed_domains = ['pin7.ru']

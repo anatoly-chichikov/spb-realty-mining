@@ -1,7 +1,7 @@
 # coding=utf-8
 import re
 from datetime import datetime
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple
 
 from bs4 import Tag
 

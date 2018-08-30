@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Dict, List, Generator
+from typing import Dict, List
 
 import pandas as pd
 from pandas.io.json import json_normalize
