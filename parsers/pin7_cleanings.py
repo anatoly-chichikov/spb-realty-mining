@@ -21,6 +21,8 @@ def clean_room(room: Tag) -> str:
         room = 'f3'
     elif room.startswith('4к.кв'):
         room = 'f4'
+    elif room.startswith('к1('):
+        room = 'r1'
     elif room.startswith('к2('):
         room = 'r2'
     elif room.startswith('к3('):
