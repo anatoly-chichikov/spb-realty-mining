@@ -3,6 +3,7 @@ import logging
 
 from parsers.pin7 import ParsedPages
 from scrappers.pin7 import CrawlingTask
+from stats.summary import Statistics
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,6 @@ class ShellArgs:
         Нас интересует 'pcode', должна выглядеть примерно так: 'pcode=imvcn7cdnsrqqm0crsl4ubkpp1'.
         В итоге пишем для запуска сбора: 'python3 -m realty --task gather --cookie imvcn7cdnsrqqm0crsl4ubkpp1'.
         """
-
         task_help = """
         Вы можете выбрать одну из задач:
         gather - сбор информации из pin7.ru,
@@ -46,11 +46,13 @@ class ChosenApp:
             self,
             args: ShellArgs,
             crawling: CrawlingTask,
-            parsed: ParsedPages
+            parsed: ParsedPages,
+            stats: Statistics
     ) -> None:
         self._args = args
         self._crawling = crawling
         self._parsed = parsed
+        self._stats = stats
 
     def start(self) -> None:
         logger.info("Work started")
@@ -68,13 +70,12 @@ class ChosenApp:
 
     def _gather_process(self, cookie: str) -> None:
         logger.info("gather")
-
         self._crawling.wait(cookie)
 
     def _convert_data_to_table_format(self) -> None:
         logger.info("transform")
-
         self._parsed.save()
 
     def _stats_of_data(self) -> None:
         logger.info("stats")
+        self._stats.print()

@@ -127,6 +127,8 @@ from scrapy.crawler import CrawlerProcess
 from parsers.pin7 import ParsedPages
 from scrappers.pin7 import CrawlingTask
 from shell.args import ShellArgs, ChosenApp
+from stats.filters import MonthlyRent
+from stats.summary import Statistics
 from storages.local import CsvStorage, FileStorage
 
 logger = logging.getLogger(__name__)
@@ -141,16 +143,20 @@ SCRAPPY_CONF = {
 }
 
 if __name__ == '__main__':
-    file_storage = FileStorage(SCRAPPED_FILE)
+    file = FileStorage(SCRAPPED_FILE)
+    csv = CsvStorage(TABLE_FORMAT_FILE)
 
     ChosenApp(
         ShellArgs(),
         CrawlingTask(
-            file_storage,
+            file,
             CrawlerProcess(SCRAPPY_CONF)
         ),
         ParsedPages(
-            file_storage,
-            CsvStorage(TABLE_FORMAT_FILE)
+            file,
+            csv
+        ),
+        Statistics(
+            MonthlyRent(csv)
         )
     ).start()
