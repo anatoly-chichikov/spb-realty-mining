@@ -13,3 +13,7 @@ def square(num: float) -> str:
 
 def flat(num: float) -> str:
     return "{0:n} квартир".format(int(num))
+
+
+def perc(num: float) -> str:
+    return "{0}%".format(round(num, 2))
