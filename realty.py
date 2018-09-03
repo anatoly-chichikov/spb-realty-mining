@@ -128,6 +128,7 @@ from parsers.pin7 import ParsedPages
 from scrappers.pin7 import CrawlingTask
 from shell.args import ShellArgs, ChosenApp
 from stats.filters import MonthlyRent
+from stats.statistics import General, Prices, Squares
 from stats.summary import Statistics
 from storages.local import CsvStorage, FileStorage
 
@@ -145,6 +146,7 @@ SCRAPPY_CONF = {
 if __name__ == '__main__':
     file = FileStorage(SCRAPPED_FILE)
     csv = CsvStorage(TABLE_FORMAT_FILE)
+    rent = MonthlyRent(csv)
 
     ChosenApp(
         ShellArgs(),
@@ -156,7 +158,9 @@ if __name__ == '__main__':
             file,
             csv
         ),
-        Statistics(
-            MonthlyRent(csv)
-        )
+        Statistics([
+            General(rent),
+            Prices(rent),
+            Squares(rent)
+        ])
     ).start()
