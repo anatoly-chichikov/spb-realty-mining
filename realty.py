@@ -134,25 +134,27 @@ from storages.local import CsvStorage, FileStorage
 
 logger = logging.getLogger(__name__)
 
-SCRAPPED_FILE = 'scrapped_data.txt'
-TABLE_FORMAT_FILE = 'data.csv'
-SCRAPPY_CONF = {
-    'DOWNLOAD_DELAY': 1,
-    'USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) '
-                  'AppleWebKit/605.1.15 (KHTML, like Gecko) '
-                  'Version/11.1.2 Safari/605.1.15'
+conf = {
+    'SCRAPPED_FILE': 'scrapped_data.txt',
+    'TABLE_FORMAT_FILE': 'data.csv',
+    'SCRAPPY_CONF': {
+        'DOWNLOAD_DELAY': 1,
+        'USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) '
+                      'AppleWebKit/605.1.15 (KHTML, like Gecko) '
+                      'Version/11.1.2 Safari/605.1.15'
+    }
 }
 
 if __name__ == '__main__':
-    file = FileStorage(SCRAPPED_FILE)
-    csv = CsvStorage(TABLE_FORMAT_FILE)
+    file = FileStorage(conf['SCRAPPED_FILE'])
+    csv = CsvStorage(conf['TABLE_FORMAT_FILE'])
     rent = MonthlyRent(csv)
 
     ChosenApp(
         ShellArgs(),
         CrawlingTask(
             file,
-            CrawlerProcess(SCRAPPY_CONF)
+            CrawlerProcess(conf['SCRAPPY_CONF'])
         ),
         ParsedPages(
             file,
