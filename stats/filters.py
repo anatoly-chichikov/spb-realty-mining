@@ -18,7 +18,6 @@ class MonthlyRent:
         return rows[
             (rows['address.district'].isin([
                 'петроградский',
-                'пригород',
                 'центральный',
                 'адмиралтейский',
                 'василеостровский',
