@@ -128,7 +128,7 @@ from parsers.pin7 import ParsedPages
 from scrappers.pin7 import CrawlingTask
 from shell.args import ShellArgs, ChosenApp
 from stats.filters import MonthlyRent
-from stats.statistics import General, Prices, Squares
+from stats.statistics import General, Prices, Squares, Districts
 from stats.summary import Statistics
 from storages.local import CsvStorage, FileStorage
 
@@ -163,6 +163,7 @@ if __name__ == '__main__':
         Statistics([
             General(rent),
             Prices(rent),
-            Squares(rent)
+            Squares(rent),
+            Districts(rent)
         ])
     ).start()

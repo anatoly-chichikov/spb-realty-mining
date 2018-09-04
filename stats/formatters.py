@@ -1,4 +1,5 @@
 import locale
+from typing import Iterable
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -17,3 +18,7 @@ def flat(num: float) -> str:
 
 def perc(num: float) -> str:
     return "{0}%".format(round(num, 2))
+
+
+def districts(names: Iterable[str]) -> str:
+    return ", ".join([name.capitalize() for name in names])

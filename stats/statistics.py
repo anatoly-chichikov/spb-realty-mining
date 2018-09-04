@@ -1,5 +1,5 @@
 from stats.filters import MonthlyRent
-from stats.formatters import flat, perc, price, square
+from stats.formatters import flat, perc, price, square, districts
 from stats.summary import Summary, logger
 
 
@@ -88,3 +88,62 @@ class Squares(Summary):
         logger.info('===> Половина предложений меньше - %s', square(valuable.median()))
         logger.info('===> Большая часть (90%%) меньше - %s', square(valuable.quantile(.9)))
         logger.info('===> Большая часть (90%%) больше - %s', square(valuable.quantile(.1)))
+
+
+class Districts(Summary):
+
+    def __init__(self, monthly: MonthlyRent) -> None:
+        self._monthly = monthly
+
+    def stats(self) -> None:
+        rows = self._monthly.rows()
+
+        logger.info('> Районы:')
+
+        by_price = rows[['address.district', 'price.amount']] \
+            .groupby('address.district') \
+            .agg('mean')
+
+        logger.info(
+            '===> Самые дорогие - %s',
+            districts(by_price.sort_values('price.amount', ascending=False).head(3).index)
+        )
+        logger.info(
+            '===> Самые дешевые - %s',
+            districts(by_price.sort_values('price.amount', ascending=True).head(3).index)
+        )
+
+        by_options = rows[[
+            'address.district',
+            'options.cool_renovation',
+            'options.allowed_children',
+            'options.allowed_pets'
+
+        ]] \
+            .groupby('address.district') \
+            .agg('sum')
+
+        logger.info(
+            '===> Больше с хорошим ремонтом - %s',
+            districts(by_options.sort_values('options.cool_renovation', ascending=False).head(3).index)
+        )
+        logger.info(
+            '===> Меньше с хорошим ремонтом - %s',
+            districts(by_options.sort_values('options.cool_renovation', ascending=True).head(3).index)
+        )
+        logger.info(
+            '===> Больше заселяют с детьми - %s',
+            districts(by_options.sort_values('options.allowed_children', ascending=False).head(3).index)
+        )
+        logger.info(
+            '===> Меньше заселяют с детьми - %s',
+            districts(by_options.sort_values('options.allowed_children', ascending=True).head(3).index)
+        )
+        logger.info(
+            '===> Больше допускают животных - %s',
+            districts(by_options.sort_values('options.allowed_pets', ascending=False).head(3).index)
+        )
+        logger.info(
+            '===> Меньше допускают животных - %s',
+            districts(by_options.sort_values('options.allowed_pets', ascending=True).head(3).index)
+        )
